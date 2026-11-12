@@ -228,7 +228,7 @@
       adminMessage.className = `admin-message ${type}`.trim();
     };
 
-    logoTile.addEventListener('click', () => {
+    const registerTap = () => {
       const now = Date.now();
       taps = taps.filter((t) => now - t < 2500);
       taps.push(now);
@@ -236,7 +236,14 @@
         taps = [];
         open();
       }
-    });
+    };
+    // No celular contamos no touchend e cancelamos o padrão: assim o Safari
+    // não interpreta os toques rápidos como zoom (e o "click" não duplica).
+    logoTile.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      registerTap();
+    }, { passive: false });
+    logoTile.addEventListener('click', registerTap); // mouse / desktop
     if (location.hash === '#admin') open();
     window.addEventListener('hashchange', () => { if (location.hash === '#admin') open(); });
     $('#closeAdmin').addEventListener('click', close);
