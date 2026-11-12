@@ -1,6 +1,6 @@
 // Service worker da câmera descartável.
 // Ao alterar qualquer arquivo do site, aumente CACHE_VERSION para forçar a atualização.
-const CACHE_VERSION = 'v4';
+const CACHE_VERSION = 'v5';
 const CACHE_NAME = `camera-lm-${CACHE_VERSION}`;
 
 const APP_SHELL = [
