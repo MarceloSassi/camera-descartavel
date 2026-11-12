@@ -2,7 +2,7 @@ window.REVEAL_CONFIG = {
   APP_NAME: 'Casamento de Lorena e Marcelo',
   PHOTO_LIMIT: 20,
   REVEAL_AT: '2026-11-29T23:00:00-03:00',
-  APPS_SCRIPT_URL: 'COLE_AQUI_A_URL_DO_SEU_WEB_APP',
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxI5DLwJnkPxg1I6IOoQOa-W6JHKA6JIBTozBV2ALY4gSiBu8RNK8c5kq5MvC938Yqt/exec',
   MAX_IMAGE_SIDE: 1600,
   JPEG_QUALITY: 0.82
 };
