@@ -105,10 +105,13 @@
     try {
       // A foto vai primeiro para a fila local (IndexedDB). Assim ela não se
       // perde se a internet cair ou se o convidado fechar o app.
-      await queue.add({ filename: buildFilename(), blob: prepared.blob });
+      // Guardamos ArrayBuffer (e não Blob): o Safari/iOS falha ao gravar Blob.
+      const data = await new Response(prepared.blob).arrayBuffer();
+      await queue.add({ filename: buildFilename(), data });
     } catch (err) {
+      console.error('Falha ao preparar o envio:', err);
       uploadButton.disabled = false;
-      setMessage('Falha ao preparar o envio. Tente novamente.', 'error');
+      setMessage(`Falha ao preparar o envio. Tente novamente. (${err?.message || err})`, 'error');
       return;
     }
 
@@ -214,7 +217,9 @@
 
     let dataUrl;
     try {
-      dataUrl = await blobToDataUrl(item.blob);
+      // item.blob: fotos guardadas pela versão anterior do app.
+      const blob = item.blob || new Blob([item.data], { type: 'image/jpeg' });
+      dataUrl = await blobToDataUrl(blob);
     } catch (err) {
       // Item corrompido: descarta para não travar a fila.
       await queue.remove(item.id);
@@ -351,32 +356,50 @@
       return dbPromise;
     }
 
-    function run(mode, fn) {
+    // Se o IndexedDB falhar em qualquer operação (ex.: Safari/iOS com
+    // "Error preparing Blob/File data"), passamos a usar só a memória.
+    function useMemory(err) {
+      console.warn('Fila local indisponível, usando memória:', err);
+      dbPromise = Promise.resolve(null);
+    }
+
+    function run(mode, idbOp, memoryOp) {
       return open().then((db) => {
-        if (!db) return fn(null);
+        if (!db) return memoryOp();
         return new Promise((resolve, reject) => {
-          const tx = db.transaction(STORE, mode);
-          const req = fn(tx.objectStore(STORE));
-          let result;
-          req.onsuccess = () => { result = req.result; };
-          tx.oncomplete = () => resolve(result);
-          tx.onerror = () => reject(tx.error);
-          tx.onabort = () => reject(tx.error);
+          let tx;
+          try {
+            tx = db.transaction(STORE, mode);
+            const req = idbOp(tx.objectStore(STORE));
+            let result;
+            req.onsuccess = () => { result = req.result; };
+            tx.oncomplete = () => resolve(result);
+            tx.onerror = () => reject(tx.error);
+            tx.onabort = () => reject(tx.error);
+          } catch (err) {
+            reject(err);
+          }
+        }).catch((err) => {
+          useMemory(err);
+          return memoryOp();
         });
       });
     }
 
     return {
-      add: (item) => run('readwrite', (store) => store
-        ? store.add({ ...item, createdAt: Date.now() })
-        : (memory.push({ ...item, id: ++memoryId }), memoryId)),
-      first: () => run('readonly', (store) => store
-        ? store.openCursor()
-        : { value: memory[0] }).then((cursor) => cursor?.value || null),
-      remove: (id) => run('readwrite', (store) => store
-        ? store.delete(id)
-        : memory.splice(memory.findIndex((m) => m.id === id) >>> 0, 1)),
-      count: () => run('readonly', (store) => store ? store.count() : memory.length)
+      // item: { filename, data: ArrayBuffer }
+      add: (item) => run('readwrite',
+        (store) => store.add({ ...item, createdAt: Date.now() }),
+        () => { memory.push({ ...item, id: ++memoryId }); return memoryId; }),
+      first: () => run('readonly',
+        (store) => store.openCursor(),
+        () => ({ value: memory[0] })).then((cursor) => cursor?.value || null),
+      remove: (id) => run('readwrite',
+        (store) => store.delete(id),
+        () => { const i = memory.findIndex((m) => m.id === id); if (i >= 0) memory.splice(i, 1); }),
+      count: () => run('readonly',
+        (store) => store.count(),
+        () => memory.length)
     };
   }
 
