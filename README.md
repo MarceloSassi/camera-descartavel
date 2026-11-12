@@ -148,6 +148,12 @@ No celular:
 
 ---
 
+## Resetar o limite de fotos
+
+Veja [RESETAR-LIMITE.md](RESETAR-LIMITE.md): como zerar o contador de um celular, zerar as contagens no Apps Script e o checklist antes do casamento.
+
+---
+
 ## Estrutura
 
 ```text
@@ -162,6 +168,7 @@ reveal-festa/
 ├── sw.js
 ├── manifest.webmanifest
 ├── README.md
+├── RESETAR-LIMITE.md
 ├── assets/
 │   ├── logo-evento.png
 │   ├── logo-mini.png

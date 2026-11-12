@@ -145,3 +145,21 @@ function jsonp_(e, payload) {
     .createTextOutput(`${callback}(${JSON.stringify(payload)});`)
     .setMimeType(ContentService.MimeType.JAVASCRIPT);
 }
+
+/**
+ * Zera a contagem de fotos de todos os convidados no servidor.
+ * Rode manualmente pelo editor (selecione "resetarLimites" e clique em Executar).
+ * Não é acessível pelo site. Veja RESETAR-LIMITE.md.
+ */
+function resetarLimites() {
+  const props = PropertiesService.getScriptProperties();
+  const all = props.getProperties();
+  let total = 0;
+  Object.keys(all).forEach(function (key) {
+    if (key.indexOf('lorena-marcelo:') === 0) {
+      props.deleteProperty(key);
+      total++;
+    }
+  });
+  Logger.log(total + ' contagem(ns) zerada(s).');
+}
