@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#fffaf6" />
+  <meta name="description" content="Câmera descartável digital do casamento de Lorena e Marcelo." />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Lorena &amp; Marcelo" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" />
+  <title>Casamento de Lorena e Marcelo — câmera descartável</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="has-nav">
+  <main class="page">
+    <div class="bento">
+      <section class="tile tile-hero">
+        <p class="eyebrow">câmera descartável</p>
+        <h1 id="eventName" class="names">Lorena <span class="amp">&amp;</span> Marcelo</h1>
+        <p class="date">29 · 11 · 2026</p>
+      </section>
+
+      <section class="tile tile-logo" aria-hidden="true">
+        <img src="assets/logo-mini.png" alt="" class="logo" />
+      </section>
+
+      <section class="tile tile-count" aria-live="polite">
+        <span id="counterNumber" class="count-number">20</span>
+        <span id="counterLabel" class="count-label">fotos restantes</span>
+        <span class="count-bar"><span id="counterBar"></span></span>
+      </section>
+
+      <a class="tile tile-reveal" href="gallery.html">
+        <span class="reveal-text">
+          <span class="tile-kicker">revelação às 23h</span>
+          <span id="revealCountdown" class="reveal-time">--</span>
+        </span>
+        <span class="tile-arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+
+    <p class="hint">Toque no botão, confira e envie.</p>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <nav class="bottom-nav" aria-label="Navegação">
+    <a class="nav-item is-active" href="index.html" aria-current="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1z"/></svg>
+      <span>Início</span>
+    </a>
+    <button id="cameraButton" class="shutter" type="button" aria-label="Tirar foto">
+      <span class="shutter-core">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 6 10 4h4l1.5 2H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"/><circle cx="12" cy="12.5" r="3.6"/></svg>
+      </span>
+    </button>
+    <a class="nav-item" href="gallery.html">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="m3.5 16 5-5 4 4 2.5-2.5 5.5 5.5"/><circle cx="15.5" cy="9" r="1.5"/></svg>
+      <span>Revelação</span>
+    </a>
+  </nav>
+
+  <input id="cameraInput" class="sr-only" type="file" accept="image/*" capture="environment" />
+
+  <div id="previewSheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
+    <header class="sheet-header">
+      <p id="sheetTitle" class="sheet-title">Sua foto</p>
+      <button id="closeSheet" class="icon-button" type="button" aria-label="Descartar foto">×</button>
+    </header>
+    <div class="sheet-photo">
+      <img id="preview" alt="Prévia da foto" />
+      <p id="previewLoading" class="sheet-loading">Revelando…</p>
+    </div>
+    <div class="sheet-actions">
+      <button id="retakeButton" class="btn btn-ghost" type="button">Tirar outra</button>
+      <button id="uploadButton" class="btn btn-primary" type="button" disabled>Enviar foto</button>
+    </div>
+    <p class="sheet-note">Ao enviar, você compartilha a foto com Lorena e Marcelo.</p>
+  </div>
+
+  <iframe id="uploadFrame" name="uploadFrame" class="hidden-frame" title="Upload" tabindex="-1"></iframe>
+  <form id="uploadForm" class="hidden-form" method="post" target="uploadFrame"></form>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+  <script src="pwa.js"></script>
+</body>
+</html>
