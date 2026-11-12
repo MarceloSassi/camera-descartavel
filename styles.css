@@ -467,3 +467,28 @@ a { color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* ---------- Painel admin (5 toques na logo ou #admin) ---------- */
+.tile-logo { cursor: default; -webkit-user-select: none; user-select: none; }
+.admin-sheet { justify-content: flex-start; }
+.admin-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 8px;
+  padding: 20px 18px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+.admin-form input {
+  min-height: 52px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--bg);
+  font-size: 16px; /* 16px evita o zoom automático do iPhone */
+}
+.admin-form input:focus { outline: 2px solid var(--orange); outline-offset: 1px; }
+.admin-message { min-height: 20px; margin: 0; text-align: center; font-size: 14px; color: var(--muted); }
+.admin-message.error { color: var(--danger); }

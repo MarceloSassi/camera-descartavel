@@ -150,7 +150,7 @@ No celular:
 
 ## Resetar o limite de fotos
 
-Veja [RESETAR-LIMITE.md](RESETAR-LIMITE.md): como zerar o contador de um celular, zerar as contagens no Apps Script e o checklist antes do casamento.
+O app tem um **painel dos noivos escondido** (5 toques na logo), protegido por senha guardada só no Apps Script (`ADMIN_PASSWORD`). Veja [RESETAR-LIMITE.md](RESETAR-LIMITE.md): como configurar a senha, zerar o contador de um celular, zerar as contagens no Apps Script e o checklist antes do casamento.
 
 ---
 

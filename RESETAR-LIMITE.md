@@ -1,5 +1,36 @@
 # Como resetar o limite de fotos
 
+## ⭐ Pelo próprio app (painel dos noivos)
+
+O app tem uma **área escondida** para zerar limites, protegida por uma senha que fica **só no Apps Script**. Ela nunca vai para o código do site nem para o GitHub.
+
+### Configurar uma vez
+
+1. No [script.google.com](https://script.google.com), cole o `apps-script/Code.gs` atualizado no editor e troque a linha `ROOT_FOLDER_ID` pelo ID da sua pasta.
+2. Vá em **⚙️ Configurações do projeto → Propriedades do script → Adicionar propriedade**:
+   - **Propriedade:** `ADMIN_PASSWORD`
+   - **Valor:** a senha que você quiser (só você vai saber)
+3. **Implantar → Gerenciar implantações → ✏️ Editar → Versão: Nova versão → Implantar**.
+   *(Use "Nova versão" na implantação existente para manter a mesma URL `/exec`.)*
+
+### Como usar
+
+1. Abra o app e **toque 5 vezes rápido na logo**. Também dá para abrir o site com `#admin` no fim do endereço, por exemplo `https://marcelosassi.github.io/camera-descartavel/#admin`.
+2. Digite a senha e escolha:
+   - **Zerar este celular**: este aparelho volta a ter 20 fotos.
+   - **Zerar todos os convidados**: zera as contagens no servidor. **Cada celular volta a ter 20 fotos na próxima vez que abrir o app**, e aparece o aviso "Seu contador foi renovado".
+
+### Segurança
+
+- A senha é conferida **no servidor**. O app só envia o que você digitou, por HTTPS.
+- Depois de **5 senhas erradas**, o painel fica bloqueado por **15 minutos**, mesmo para a senha certa.
+- Para trocar a senha, edite `ADMIN_PASSWORD` nas Propriedades do script. Não precisa reimplantar.
+
+---
+
+## Outras formas (sem o painel)
+
+
 O limite de **20 fotos por convidado** é controlado em dois lugares:
 
 | Onde | O que guarda | Efeito |
@@ -65,13 +96,13 @@ Depois:
 
 A função só roda quando você a executa pelo editor. Ninguém consegue chamá-la pelo site, e não é preciso publicar uma nova versão.
 
-> ℹ️ Zerar o servidor **não** zera o contador que aparece no celular. Para recomeçar um aparelho do zero, apague os dados do site (seção 1).
+> ℹ️ Rodar `resetarLimites` pelo editor **não** zera o contador que aparece nos celulares. Para isso, use **Zerar todos os convidados** no painel do app, que também avisa cada celular.
 
 ---
 
 ## 3. Checklist antes do casamento
 
-- [ ] Rodar `resetarLimites` no Apps Script.
+- [ ] Abrir o painel (5 toques na logo) → **Zerar todos os convidados**. Ou rodar `resetarLimites` no Apps Script.
 - [ ] Apagar as fotos de teste da pasta do Google Drive.
 - [ ] Apagar os dados do site nos celulares usados para testar (seção 1).
 - [ ] Conferir se `REVEAL_AT` em `config.js` está em `2026-11-29T23:00:00-03:00`.

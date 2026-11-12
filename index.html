@@ -27,7 +27,7 @@
         <p class="date">29 · 11 · 2026</p>
       </section>
 
-      <section class="tile tile-logo" aria-hidden="true">
+      <section class="tile tile-logo" id="logoTile">
         <img src="assets/logo-mini.png" alt="" class="logo" />
       </section>
 
@@ -83,6 +83,20 @@
       <button id="uploadButton" class="btn btn-primary" type="button" disabled>Enviar foto</button>
     </div>
     <p class="sheet-note">Ao enviar, você compartilha a foto com Lorena e Marcelo.</p>
+  </div>
+
+  <div id="adminSheet" class="sheet admin-sheet" role="dialog" aria-modal="true" aria-labelledby="adminTitle" hidden>
+    <header class="sheet-header">
+      <p id="adminTitle" class="sheet-title">Área dos noivos</p>
+      <button id="closeAdmin" class="icon-button" type="button" aria-label="Fechar">×</button>
+    </header>
+    <form id="adminForm" class="admin-form" autocomplete="off">
+      <label for="adminPassword" class="tile-kicker">senha</label>
+      <input id="adminPassword" type="password" inputmode="text" autocomplete="current-password" required />
+      <button class="btn btn-ghost" type="submit" data-scope="device">Zerar este celular</button>
+      <button class="btn btn-primary" type="submit" data-scope="all">Zerar todos os convidados</button>
+      <p id="adminMessage" class="admin-message" role="status" aria-live="polite"></p>
+    </form>
   </div>
 
   <iframe id="uploadFrame" name="uploadFrame" class="hidden-frame" title="Upload" tabindex="-1"></iframe>

@@ -22,6 +22,7 @@
 
   const guestKey = 'lorena_marcelo_wedding_guest';
   const countKey = 'lorena_marcelo_wedding_count';
+  const epochKey = 'lorena_marcelo_wedding_reset_epoch';
   const UPLOAD_TIMEOUT_MS = 120000;
 
   const guestId = getOrCreateGuestId();
@@ -44,7 +45,10 @@
         : `${capitalize(pendingLabel())} aguardando conexão.`, '', true);
     }
     flushQueue();
+    syncResetEpoch();
   });
+
+  setupAdmin();
 
   window.addEventListener('online', () => {
     if (pendingCount > 0) setMessage('Conexão de volta. Enviando…', '', true);
@@ -154,6 +158,129 @@
     }
     flushQueue();
   });
+
+  // ---------- Reset de limites ----------
+
+  // Zera o contador deste celular, mantendo só as fotos ainda na fila.
+  function resetLocalCount() {
+    localCount = pendingCount;
+    localStorage.setItem(countKey, String(localCount));
+    updateCounter(true);
+  }
+
+  // Se os noivos zeraram todos os convidados, o servidor muda o resetEpoch.
+  // Cada celular compara com o último que viu e zera o próprio contador.
+  function syncResetEpoch() {
+    if (!isConfigured() || !navigator.onLine) return;
+    const callbackName = `weddingStatus_${Date.now()}`;
+    const script = document.createElement('script');
+    const cleanup = () => { delete window[callbackName]; script.remove(); };
+    window[callbackName] = (payload) => {
+      cleanup();
+      const serverEpoch = payload && payload.resetEpoch;
+      if (!serverEpoch) return;
+      const seen = localStorage.getItem(epochKey) || '0';
+      if (serverEpoch !== seen) {
+        localStorage.setItem(epochKey, serverEpoch);
+        if (localCount > pendingCount) {
+          resetLocalCount();
+          setMessage(`Seu contador foi renovado: ${remaining()} fotos ✦`, 'ok');
+        }
+      }
+    };
+    script.onerror = cleanup;
+    script.src = `${cfg.APPS_SCRIPT_URL}?${new URLSearchParams({ action: 'status', callback: callbackName })}`;
+    document.body.appendChild(script);
+  }
+
+  // Painel escondido: 5 toques rápidos na logo, ou abrir o site com #admin.
+  function setupAdmin() {
+    const adminSheet = $('#adminSheet');
+    const adminForm = $('#adminForm');
+    const adminPassword = $('#adminPassword');
+    const adminMessage = $('#adminMessage');
+    const logoTile = $('#logoTile');
+    let taps = [];
+    let busy = false;
+    let lastScope = 'device';
+    // e.submitter não existe em Safari antigo: guardamos o botão clicado.
+    adminForm.querySelectorAll('button[data-scope]').forEach((btn) => {
+      btn.addEventListener('click', () => { lastScope = btn.dataset.scope; });
+    });
+
+    const open = () => {
+      adminMessage.textContent = '';
+      adminMessage.className = 'admin-message';
+      adminSheet.hidden = false;
+      document.body.classList.add('sheet-open');
+      requestAnimationFrame(() => adminSheet.classList.add('is-open'));
+      setTimeout(() => adminPassword.focus(), 50);
+    };
+    const close = () => {
+      adminPassword.value = '';
+      adminSheet.classList.remove('is-open');
+      document.body.classList.remove('sheet-open');
+      setTimeout(() => { if (!adminSheet.classList.contains('is-open')) adminSheet.hidden = true; }, 260);
+      if (location.hash === '#admin') history.replaceState(null, '', location.pathname + location.search);
+    };
+    const say = (text, type = '') => {
+      adminMessage.textContent = text;
+      adminMessage.className = `admin-message ${type}`.trim();
+    };
+
+    logoTile.addEventListener('click', () => {
+      const now = Date.now();
+      taps = taps.filter((t) => now - t < 2500);
+      taps.push(now);
+      if (taps.length >= 5) {
+        taps = [];
+        open();
+      }
+    });
+    if (location.hash === '#admin') open();
+    window.addEventListener('hashchange', () => { if (location.hash === '#admin') open(); });
+    $('#closeAdmin').addEventListener('click', close);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !adminSheet.hidden) close();
+    });
+
+    adminForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (busy) return;
+      const scope = e.submitter?.dataset.scope || lastScope;
+      const password = adminPassword.value;
+      if (!password) return say('Digite a senha.', 'error');
+      if (!isConfigured()) return say('Configure a URL do Apps Script em config.js.', 'error');
+      if (scope === 'all' && !confirm('Zerar o limite de TODOS os convidados? Cada celular volta a ter ' + cfg.PHOTO_LIMIT + ' fotos.')) return;
+
+      busy = true;
+      say('Verificando…');
+      try {
+        // text/plain evita o preflight de CORS; o Apps Script lê o corpo cru.
+        const res = await fetch(cfg.APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'adminReset', scope, password, guestId })
+        });
+        const data = await res.json();
+        if (!data.ok) {
+          say(data.error || 'Não foi possível zerar.', 'error');
+          return;
+        }
+        if (data.resetEpoch) localStorage.setItem(epochKey, data.resetEpoch);
+        resetLocalCount();
+        close();
+        setMessage(scope === 'all'
+          ? `Limite zerado para todos (${data.cleared} convidado${data.cleared === 1 ? '' : 's'}) ✓`
+          : 'Limite deste celular zerado ✓', 'ok');
+      } catch (err) {
+        say('Sem conexão com o servidor. Tente de novo.', 'error');
+      } finally {
+        busy = false;
+        adminPassword.value = '';
+      }
+    });
+  }
 
   function openCamera() {
     if (remaining() <= 0) return;
