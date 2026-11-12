@@ -1,6 +1,6 @@
 // Service worker da câmera descartável.
 // Ao alterar qualquer arquivo do site, aumente CACHE_VERSION para forçar a atualização.
-const CACHE_VERSION = 'v7';
+const CACHE_VERSION = 'v8';
 const CACHE_NAME = `camera-lm-${CACHE_VERSION}`;
 
 const APP_SHELL = [
@@ -15,6 +15,7 @@ const APP_SHELL = [
   './manifest.webmanifest',
   './assets/logo-evento.png',
   './assets/logo-mini.png',
+  './assets/foto-noivos.webp',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
   './assets/icons/apple-touch-icon.png',
